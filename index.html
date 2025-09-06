@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실시간 퀴즈 플랫폼 (Live Quiz)</title>
+
+  <!-- Fonts / Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#121823" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <main class="container">
+    <div class="topbar">
+      <div class="live">
+        <span class="dot"></span>
+        <span>LIVE</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="room">
+        <label>세션 코드</label>
+        <input id="roomIdInput" placeholder="예: classA" />
+        <button class="btn ghost" id="btnConnect">접속</button>
+      </div>
+      <div class="mode-switch">
+        <button id="btnTeacherMode" class="btn ghost small">관리자</button>
+        <button id="btnStudentMode" class="btn ghost small">학생</button>
+      </div>
+    </div>
+
+    <section class="status">
+      <h2>실시간 퀴즈</h2>
+      <p id="statusText">세션에 접속해 주세요.</p>
+    </section>
+
+    <section id="joinCard" class="card hidden">
+      <h3>학생 참가</h3>
+      <div class="row">
+        <label for="studentName">이름</label>
+        <input id="studentName" maxlength="20" placeholder="이름 입력" />
+      </div>
+      <button class="btn primary" id="btnJoin">참가하기</button>
+    </section>
+
+    <section id="studentQuiz" class="card hidden">
+      <div class="quiz-header">
+        <div class="badge" id="quizTypeBadge">문항</div>
+        <h3 id="questionText">질문이 여기에 표시됩니다.</h3>
+        <p class="muted" id="progressText">0 / 0</p>
+      </div>
+      <div id="optionsContainer" class="options-grid"></div>
+      <div id="subjectiveBox" class="hidden">
+        <input id="subjectiveInput" placeholder="답을 입력하세요" />
+        <button id="btnSubmitSubjective" class="btn primary">제출</button>
+      </div>
+      <div class="answer-state" id="answerState"></div>
+    </section>
+
+    <section id="teacherPanel" class="card hidden">
+      <div class="tabs">
+        <button class="tab active" data-tab="build">문항 설계</button>
+        <button class="tab" data-tab="control">진행/모니터링</button>
+        <button class="tab" data-tab="results">결과</button>
+      </div>
+
+      <div class="tab-panel" id="tab-build">
+        <div class="row wrap">
+          <div>
+            <label>퀴즈 제목</label>
+            <input id="quizTitle" placeholder="예: 5학년 2반 1주차" />
+          </div>
+          <div>
+            <label>문항 수 (1~20)</label>
+            <input id="questionCount" type="number" min="1" max="20" value="3" />
+          </div>
+          <div class="row gap-sm">
+            <button id="btnBuildForm" class="btn ghost">문항 입력 폼 생성</button>
+            <button id="btnLoadSample" class="btn ghost">샘플 불러오기</button>
+          </div>
+        </div>
+        <div id="builder"></div>
+        <div class="row end">
+          <button id="btnSaveQuiz" class="btn primary">퀴즈 저장</button>
+        </div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-control">
+        <div class="row wrap">
+          <button id="btnStart" class="btn primary">퀴즈 시작</button>
+          <button id="btnStop" class="btn danger ghost">종료</button>
+          <button id="btnPrev" class="btn ghost">이전</button>
+          <button id="btnNext" class="btn ghost">다음</button>
+          <label class="switch">
+            <input type="checkbox" id="toggleAccept" />
+            <span>제출 허용</span>
+          </label>
+        </div>
+        <div class="monitor">
+          <div>
+            <h4>문항</h4>
+            <p id="ctlQuestion">-</p>
+          </div>
+          <div>
+            <h4>제출 현황</h4>
+            <div id="chips" class="chips"></div>
+          </div>
+        </div>
+        <div id="shortGrader" class="hidden">
+          <h4>주관식 채점</h4>
+          <div id="shortAnswers"></div>
+        </div>
+      </div>
+
+      <div class="tab-panel hidden" id="tab-results">
+        <div id="resultsContainer"></div>
+        <div class="row end">
+          <button id="btnExportCSV" class="btn ghost">CSV 내보내기</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- App Files -->
+  <script src="firebase.js"></script>
+  <script src="app.js"></script>
+
+  <!-- PWA: Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
